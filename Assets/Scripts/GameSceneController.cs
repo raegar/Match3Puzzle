@@ -170,14 +170,56 @@ public class GameSceneController : MonoBehaviour
 
             yield return new WaitForSeconds(0.3f);
 
-            //DropPuzzlePieces();
-            //AddPuzzlePieces();
+            DropPuzzlePieces();
+            AddPuzzlePieces();
 
             yield return new WaitForSeconds(1.0f);
 
             CheckGameOver();
         }
     }
+
+    private void DropPuzzlePieces()
+    {
+        for (int y = 0; y < BoardHeight; y++)
+        {
+            for (int x = 0; x < BoardWidth; x++)
+            {
+                if (board[x, y].Destroyed)
+                {
+                    bool dropped = false;
+
+                    for (int j = y + 1; j < BoardHeight && dropped == false; j++) //Make the piece above the destroyed piece fall
+                    {
+                        if (board[x, j].Destroyed == false)
+                        {
+                            Vector2 boardLocation1 = board[x, y].BoardLocation;
+                            Vector2 boardLocation2 = board[x, j].BoardLocation;
+                            board[x, y].BoardLocation = boardLocation2;
+                            board[x, j].BoardLocation = boardLocation1;
+
+                            iTween.MoveTo(board[x, j].gameObject, iTween.Hash(
+                                "position", board[x, y].transform.position,
+                                "time", 0.3f
+                            ));
+
+                            board[x, y].transform.position = board[x, j].transform.position;
+
+                            PuzzlePieceController fallingPiece = board[x, j];
+
+                            board[x, j] = board[x, y];
+                            board[x, y] = fallingPiece;
+
+                            dropped = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void AddPuzzlePieces()
+    { }
 
 
     private void CheckGameOver()
