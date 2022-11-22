@@ -170,8 +170,8 @@ public class GameSceneController : MonoBehaviour
 
             yield return new WaitForSeconds(0.3f);
 
-            DropPuzzlePieces();
-            AddPuzzlePieces();
+            //DropPuzzlePieces();
+            //AddPuzzlePieces();
 
             yield return new WaitForSeconds(1.0f);
 
@@ -183,15 +183,85 @@ public class GameSceneController : MonoBehaviour
     private void CheckGameOver()
     { }
 
-    private List<PuzzlePieceController> CheckMatch(PuzzlePieceController puzzzlePiece)
+    private List<PuzzlePieceController> CheckMatch(PuzzlePieceController puzzlePiece)
     {
-        return new List<PuzzlePieceController>();
+        List<PuzzlePieceController> matchingNeighbours = new List<PuzzlePieceController>();
+
+        //Horizontal Matching Logic
+        int x = 0;
+        int y = (int)puzzlePiece.BoardLocation.y;
+        bool reachedPuzzlePiece = false;
+
+        while (x < BoardWidth)
+        {
+            if (board[x, y].Destroyed == false && board[x, y].ID == puzzlePiece.ID) //Is it a valid pieces with the same colour as the one we swapped?
+            {
+                matchingNeighbours.Add(board[x, y]);
+                if (board[x, y] == puzzlePiece) //Have we reached the piece we swapped?
+                {
+                    reachedPuzzlePiece = true;
+                }
+            }
+            else
+            {
+                if (reachedPuzzlePiece == false)
+                {
+                    //Didn't reach the selected piece
+                    matchingNeighbours.Clear();
+                }
+                else if (matchingNeighbours.Count >= 3)
+                {
+                    //Reached a match of 3 or more piences
+                    return matchingNeighbours;
+                }
+                else //Didn't match at least 3 pieces
+                {
+                    matchingNeighbours.Clear();
+                }
+            }
+            x++;
+        }
+
+        if (matchingNeighbours.Count >= 3)
+        {
+            return matchingNeighbours;
+        }
+
+        //Vertical Matching Logic
+        x = (int)puzzlePiece.BoardLocation.x;
+        y = 0;
+        reachedPuzzlePiece = false;
+        matchingNeighbours.Clear();
+
+        while (y < BoardHeight)
+        {
+            if (board[x, y].Destroyed == false && board[x, y].ID == puzzlePiece.ID)
+            {
+                matchingNeighbours.Add(board[x, y]);
+                if (board[x, y] == puzzlePiece)
+                {
+                    reachedPuzzlePiece = true;
+                }
+            }
+            else
+            {
+                if (reachedPuzzlePiece == false)
+                {
+                    matchingNeighbours.Clear();
+                }
+                else if (matchingNeighbours.Count >= 3)
+                {
+                    return matchingNeighbours;
+                }
+                else
+                {
+                    matchingNeighbours.Clear();
+                }
+            }
+            y++;
+        }
+
+        return matchingNeighbours;
     }
-
-    private void DropPuzzlePieces()
-    { }
-
-    private void AddPuzzlePieces()
-    { }
 
 }
