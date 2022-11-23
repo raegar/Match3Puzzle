@@ -219,11 +219,49 @@ public class GameSceneController : MonoBehaviour
     }
 
     private void AddPuzzlePieces()
-    { }
+    {
+        int firstY = -1;
+        for (int y = 0; y < BoardHeight; y++)
+        {
+            for (int x = 0; x < BoardWidth; x++)
+            {
+                if (board[x, y].Destroyed)
+                {
+                    if (firstY == -1)
+                    {
+                        firstY = y; //Replace -y with the y coordinate of the first destroyed piece found
+                    }
+
+                    PuzzlePieceController oldPuzzlePiece = board[x, y];
+                    GameObject puzzlePieceInstance = Instantiate(PuzzlePiecePrefab);
+                    puzzlePieceInstance.transform.SetParent(Level);
+                    puzzlePieceInstance.transform.position = new Vector3(
+                        oldPuzzlePiece.transform.position.x,
+                        10,
+                        0
+                    );
+
+                    iTween.MoveTo(puzzlePieceInstance.gameObject, iTween.Hash(
+                        "position", oldPuzzlePiece.transform.position,
+                        "time", 0.3f,
+                        "delay", 0.1f * (y - firstY) //Allow peices to fall one after another
+                    ));
+
+                    PuzzlePieceController puzzlePiece = puzzlePieceInstance.GetComponent<PuzzlePieceController>();
+
+                    puzzlePiece.BoardLocation = oldPuzzlePiece.BoardLocation;
+                    board[x, y] = puzzlePiece;
+                    Destroy(oldPuzzlePiece.gameObject);
+                }
+            }
+        }
+    }
 
 
     private void CheckGameOver()
-    { }
+    {
+
+    }
 
     private List<PuzzlePieceController> CheckMatch(PuzzlePieceController puzzlePiece)
     {
