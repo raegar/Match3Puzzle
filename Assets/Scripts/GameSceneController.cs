@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameSceneController : MonoBehaviour
 {
@@ -17,6 +19,8 @@ public class GameSceneController : MonoBehaviour
 
     private int score;
     private bool gameOver;
+
+    public Text ScoreText;
 
     // Start is called before the first frame update
     void Start()
@@ -50,6 +54,14 @@ public class GameSceneController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown("r"))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+        if (gameOver)
+        {
+            return;
+        }
         ProcessInput();
     }
 
@@ -162,6 +174,7 @@ public class GameSceneController : MonoBehaviour
             {
                 puzzlePiece.Destroyed = true;
                 score += 100;
+                ScoreText.text = "Score: " + score;
                 iTween.ScaleTo(puzzlePiece.gameObject.gameObject, iTween.Hash(
                     "scale", Vector3.zero,
                     "time", 0.3f
@@ -260,7 +273,81 @@ public class GameSceneController : MonoBehaviour
 
     private void CheckGameOver()
     {
+        int possibleMatches = 0;
 
+        for (int y = 0; y < BoardHeight; y++)
+        {
+            for (int x = 0; x < BoardWidth; x++)
+            {
+                PuzzlePieceController puzzlePiece1 = board[x, y];
+                Vector2 boardLocation1 = puzzlePiece1.BoardLocation;
+                PuzzlePieceController puzzlePiece2;
+                Vector2 boardLocation2;
+
+                //Horizontal Swap
+                if (x < BoardWidth - 1)
+                {
+                    puzzlePiece2 = board[x + 1, y];
+                    boardLocation2 = puzzlePiece2.BoardLocation;
+                    puzzlePiece1.BoardLocation = boardLocation2;
+                    puzzlePiece2.BoardLocation = boardLocation1;
+
+                    board[(int)puzzlePiece1.BoardLocation.x, (int)puzzlePiece1.BoardLocation.y] = puzzlePiece1;
+                    board[(int)puzzlePiece2.BoardLocation.x, (int)puzzlePiece2.BoardLocation.y] = puzzlePiece2;
+
+                    if (CheckMatch(puzzlePiece1).Count >= 3 || CheckMatch(puzzlePiece2).Count >= 3)
+                    {
+                        possibleMatches++;
+                    }
+
+                    //Put things back
+                    puzzlePiece1.BoardLocation = boardLocation1;
+                    puzzlePiece2.BoardLocation = boardLocation2;
+
+                    board[(int)puzzlePiece1.BoardLocation.x, (int)puzzlePiece1.BoardLocation.y] = puzzlePiece1;
+                    board[(int)puzzlePiece2.BoardLocation.x, (int)puzzlePiece2.BoardLocation.y] = puzzlePiece2;
+                }
+
+                if (y < BoardHeight - 1)
+                {
+                    puzzlePiece2 = board[x, y + 1];
+                    boardLocation2 = puzzlePiece2.BoardLocation;
+                    puzzlePiece1.BoardLocation = boardLocation2;
+                    puzzlePiece2.BoardLocation = boardLocation1;
+
+                    board[(int)puzzlePiece1.BoardLocation.x, (int)puzzlePiece1.BoardLocation.y] = puzzlePiece1;
+                    board[(int)puzzlePiece2.BoardLocation.x, (int)puzzlePiece2.BoardLocation.y] = puzzlePiece2;
+
+                    if (CheckMatch(puzzlePiece1).Count >= 3 || CheckMatch(puzzlePiece2).Count >= 3)
+                    {
+                        possibleMatches++;
+                    }
+
+                    //Put things back
+                    puzzlePiece1.BoardLocation = boardLocation1;
+                    puzzlePiece2.BoardLocation = boardLocation2;
+
+                    board[(int)puzzlePiece1.BoardLocation.x, (int)puzzlePiece1.BoardLocation.y] = puzzlePiece1;
+                    board[(int)puzzlePiece2.BoardLocation.x, (int)puzzlePiece2.BoardLocation.y] = puzzlePiece2;
+                }
+
+            }
+        }
+        if (possibleMatches == 0)
+        {
+            OnGameOver();
+        }
+    }
+
+    private void OnGameOver()
+    {
+        Debug.Log("Game Over!");
+        if (gameOver == false)
+        {
+            gameOver = true;
+            ScoreText.text = "Score: " + score + " \nNo More Moves!\nPress R to restart";
+
+        }
     }
 
     private List<PuzzlePieceController> CheckMatch(PuzzlePieceController puzzlePiece)
