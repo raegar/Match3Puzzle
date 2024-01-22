@@ -54,20 +54,21 @@ public class GameSceneController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (gameOver)
+        {
+            // Check for touch input or mouse click
+            if ((Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) || Input.GetMouseButtonDown(0))
+            {
+                // Reload the current scene to restart the game
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            }
+            return;
+        }
         ProcessInput();
     }
 
     private void ProcessInput()
     {
-        if (Input.GetKeyDown("r"))
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
-        if (gameOver)
-        {
-            return;
-        }
-        
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 mousePosition = GameCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -346,7 +347,7 @@ public class GameSceneController : MonoBehaviour
         if (gameOver == false)
         {
             gameOver = true;
-            ScoreText.text = "Score: " + score + " \nNo More Moves!\nPress R to restart";
+            ScoreText.text = "Score: " + score + " \nNo More Moves!\Tap to restart";
 
         }
     }
