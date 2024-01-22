@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class GameSceneController : MonoBehaviour
 {
-    public int BoardWidth = 6;
+    public int BoardWidth = 3;
     public int BoardHeight = 6;
     public float PuzzlePieceSpacing = 1.5f;
 
