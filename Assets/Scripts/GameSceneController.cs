@@ -347,7 +347,7 @@ public class GameSceneController : MonoBehaviour
         if (gameOver == false)
         {
             gameOver = true;
-            ScoreText.text = "Score: " + score + " \nNo More Moves!\Tap to restart";
+            ScoreText.text = "Score: " + score + " \nNo More Moves!\nTap to restart";
 
         }
     }
